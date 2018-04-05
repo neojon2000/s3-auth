@@ -122,7 +122,7 @@ def process_request_options(options):
     else:
         newurl = res.url
 
-    if S3_ENDPOINT in options['url']:
+    if S3_ENDPOINT in newurl:
         options['url'] = newurl
         headers = s3_auth_headers(options['url'])
         options['additional_headers'].update(headers)
