@@ -13,6 +13,7 @@ import datetime
 import hashlib
 import hmac
 from urlparse import urlparse
+from urllib2 import Request, urlopen, URLError, HTTPError
 
 # pylint: disable=E0611
 from Foundation import CFPreferencesCopyAppValue
@@ -110,7 +111,19 @@ def s3_auth_headers(url):
 def process_request_options(options):
     """Make changes to options dict and return it.
        This is the fuction that munki calls."""
+    
+    req = Request(options['url'])
+    try:
+         res = urlopen(req)
+    except HTTPError as e:
+        newurl = e.url
+    except URLError as e:
+        newurl = e.url
+    else:
+        newurl = res.url
+
     if S3_ENDPOINT in options['url']:
+        options['url'] = newurl
         headers = s3_auth_headers(options['url'])
         options['additional_headers'].update(headers)
     return options
